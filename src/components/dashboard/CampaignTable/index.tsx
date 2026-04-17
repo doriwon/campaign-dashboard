@@ -1,6 +1,6 @@
 "use client";
 
-import { useFilteredData } from "@/hooks/useFilteredData";
+import { CampaignTableRow, useFilteredData } from "@/hooks/useFilteredData";
 import { useEffect, useMemo, useState } from "react";
 import { Campaign } from "@/types";
 import { useQueryClient } from "@tanstack/react-query";
@@ -27,9 +27,10 @@ export default function CampaignTable() {
     const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
     const [bulkStatus, setBulkStatus] = useState<Status>("active");
 
-    const searchedData = useMemo(() => {
-        return tableData.filter((row) => (row.name ?? "").toLowerCase().includes(search.toLowerCase()));
-    }, [tableData, search]);
+    const searchedData = useMemo(
+        () => tableData.filter((row) => row.name?.toLowerCase().includes(search.toLowerCase())),
+        [tableData, search],
+    );
 
     const sortedData = useMemo(() => {
         if (!sort) return searchedData;
@@ -106,104 +107,111 @@ export default function CampaignTable() {
     }, [totalPages]);
 
     return (
-        <section className="rounded-lg border p-4">
-            <h2 className="mb-4 text-lg font-semibold">캠페인 목록</h2>
-            <input
-                type="text"
-                placeholder="캠페인명 검색"
-                value={search}
-                onChange={(e) => handleSearch(e.target.value)}
-                className="border px-2 py-1 text-sm"
-            />
-            <span className="text-sm text-gray-500">
-                검색 결과 {totalCount}건 / 전체 {tableData.length}건
-            </span>
+        <section className="rounded-lg border p-4 space-y-4">
+            <div className="flex items-center justify-between flex-wrap gap-3">
+                <h2 className="text-lg font-semibold">캠페인 목록</h2>
 
-            {/* 일괄 상태변경 */}
-            <div className="flex items-center gap-2">
-                <span className="text-sm text-gray-500">{selectedIds.size}개 선택</span>
-                <select
-                    value={bulkStatus}
-                    onChange={(e) => setBulkStatus(e.target.value as Status)}
-                    className="rounded border px-2 py-2 text-sm"
-                >
-                    <option value="active">진행중</option>
-                    <option value="paused">일시중지</option>
-                    <option value="ended">종료</option>
-                </select>
-                <button
-                    type="button"
-                    onClick={handleBulkChange}
-                    disabled={selectedIds.size === 0}
-                    className="rounded bg-blue-600 px-3 py-2 text-sm text-white disabled:opacity-40"
-                >
-                    상태 변경
-                </button>
+                {/* 검색 + 건수 */}
+                <div className="flex items-center gap-2">
+                    <input
+                        type="text"
+                        placeholder="캠페인명 검색"
+                        value={search}
+                        onChange={(e) => handleSearch(e.target.value)}
+                        className="rounded border px-3 py-2 text-sm w-52"
+                    />
+                    <span className="text-sm text-gray-500">
+                        검색 결과 {totalCount}건 / 전체 {tableData.length}건
+                    </span>
+                </div>
+
+                {/* 일괄 상태변경 */}
+                <div className="flex items-center gap-2">
+                    <span className="text-sm text-gray-500">{selectedIds.size}개 선택</span>
+                    <select
+                        value={bulkStatus}
+                        onChange={(e) => setBulkStatus(e.target.value as Status)}
+                        className="rounded border px-2 py-2 text-sm"
+                    >
+                        <option value="active">진행중</option>
+                        <option value="paused">일시중지</option>
+                        <option value="ended">종료</option>
+                    </select>
+                    <button
+                        type="button"
+                        onClick={handleBulkChange}
+                        disabled={selectedIds.size === 0}
+                        className="rounded bg-blue-600 px-3 py-2 text-sm text-white disabled:opacity-40"
+                    >
+                        상태 변경
+                    </button>
+                </div>
             </div>
 
-            <table className="w-full text-sm">
-                <thead>
-                    <tr>
-                        <th className="pb-2 pr-3">
-                            <input type="checkbox" checked={allChecked} onChange={toggleAll} />
-                        </th>
-                        <th className="pb-2 pr-3">캠페인명</th>
-                        <th className="pb-2 pr-3">상태</th>
-                        <th className="pb-2 pr-3">매체</th>
-                        <th
-                            className="pb-2 pr-3 cursor-pointer hover:text-blue-600"
-                            onClick={() => handleSort("startDate")}
-                        >
-                            집행기간 {sortIcon("startDate")}
-                        </th>
-                        <th
-                            className="pb-2 pr-3 cursor-pointer hover:text-blue-600"
-                            onClick={() => handleSort("totalCost")}
-                        >
-                            총 집행금액 {sortIcon("totalCost")}
-                        </th>
-                        <th className="pb-2 pr-3 cursor-pointer hover:text-blue-600" onClick={() => handleSort("ctr")}>
-                            CTR(%) {sortIcon("ctr")}
-                        </th>
-                        <th className="pb-2 pr-3 cursor-pointer hover:text-blue-600" onClick={() => handleSort("cpc")}>
-                            CPC(원) {sortIcon("cpc")}
-                        </th>
-                        <th className="pb-2 pr-3 cursor-pointer hover:text-blue-600" onClick={() => handleSort("roas")}>
-                            ROAS(%) {sortIcon("roas")}
-                        </th>
-                    </tr>
-                </thead>
-
-                <tbody>
-                    {paginatedData.length === 0 ? (
-                        <tr>
-                            <td colSpan={9}>데이터 없음</td>
+            {/* 테이블 */}
+            <div className="overflow-x-auto">
+                <table className="w-full text-sm min-w-[960px]">
+                    <thead>
+                        <tr className="border-b text-left text-gray-500">
+                            <th className="pb-2 pr-3">
+                                <input type="checkbox" checked={allChecked} onChange={toggleAll} />
+                            </th>
+                            <th className="pb-2 pr-3">캠페인명</th>
+                            <th className="pb-2 pr-3">상태</th>
+                            <th className="pb-2 pr-3">매체</th>
+                            <th
+                                className="pb-2 pr-3 cursor-pointer hover:text-blue-600"
+                                onClick={() => handleSort("startDate")}
+                            >
+                                집행기간 {sortIcon("startDate")}
+                            </th>
+                            <th
+                                className="pb-2 pr-3 cursor-pointer hover:text-blue-600"
+                                onClick={() => handleSort("totalCost")}
+                            >
+                                총 집행금액 {sortIcon("totalCost")}
+                            </th>
+                            <th
+                                className="pb-2 pr-3 cursor-pointer hover:text-blue-600"
+                                onClick={() => handleSort("ctr")}
+                            >
+                                CTR(%) {sortIcon("ctr")}
+                            </th>
+                            <th
+                                className="pb-2 pr-3 cursor-pointer hover:text-blue-600"
+                                onClick={() => handleSort("cpc")}
+                            >
+                                CPC(원) {sortIcon("cpc")}
+                            </th>
+                            <th
+                                className="pb-2 pr-3 cursor-pointer hover:text-blue-600"
+                                onClick={() => handleSort("roas")}
+                            >
+                                ROAS(%) {sortIcon("roas")}
+                            </th>
                         </tr>
-                    ) : (
-                        paginatedData.map((row) => (
-                            <tr key={row.id}>
-                                <td className="py-3 pr-3">
-                                    <input
-                                        type="checkbox"
-                                        checked={selectedIds.has(row.id)}
-                                        onChange={() => toggleOne(row.id)}
-                                    />
+                    </thead>
+
+                    <tbody>
+                        {paginatedData.length === 0 ? (
+                            <tr>
+                                <td colSpan={9} className="py-8 text-center text-gray-400">
+                                    검색 결과가 없습니다.
                                 </td>
-                                <td className="py-3 pr-3">{row.name ?? "-"}</td>
-                                <td className="py-3 pr-3"> {STATUS_LABEL[row.status] ?? row.status}</td>
-                                <td className="py-3 pr-3">{row.platform}</td>
-                                <td className="py-3 pr-3">
-                                    {row.startDate} ~ {row.endDate ?? "-"}
-                                </td>
-                                <td className="py-3 pr-3">{row.totalCost}</td>
-                                <td className="py-3 pr-3">{row.ctr}</td>
-                                <td className="py-3 pr-3">{row.cpc}</td>
-                                <td className="py-3 pr-3">{row.roas}</td>
                             </tr>
-                        ))
-                    )}
-                </tbody>
-            </table>
+                        ) : (
+                            paginatedData.map((row) => (
+                                <CampaignRow
+                                    key={row.id}
+                                    row={row}
+                                    checked={selectedIds.has(row.id)}
+                                    onToggle={() => toggleOne(row.id)}
+                                />
+                            ))
+                        )}
+                    </tbody>
+                </table>
+            </div>
 
             {/* 페이지네이션 */}
             <div className="flex items-center justify-center gap-2">
@@ -232,5 +240,38 @@ export default function CampaignTable() {
                 </button>
             </div>
         </section>
+    );
+}
+
+const STATUS_COLOR: Record<Status, string> = {
+    active: "bg-green-100 text-green-700",
+    paused: "bg-yellow-100 text-yellow-700",
+    ended: "bg-gray-100 text-gray-500",
+};
+
+function CampaignRow({ row, checked, onToggle }: { row: CampaignTableRow; checked: boolean; onToggle: () => void }) {
+    const formatNumber = (n: number) => n.toLocaleString("ko-KR");
+    const formatDate = (d: string | null) => d ?? "-";
+
+    return (
+        <tr className="border-b hover:bg-gray-50">
+            <td className="py-3 pr-3">
+                <input type="checkbox" checked={checked} onChange={onToggle} />
+            </td>
+            <td className="py-3 pr-3 font-medium">{row.name}</td>
+            <td className="py-3 pr-3">
+                <span className={`rounded-full px-2 py-0.5 text-xs ${STATUS_COLOR[row.status]}`}>
+                    {STATUS_LABEL[row.status]}
+                </span>
+            </td>
+            <td className="py-3 pr-3">{row.platform}</td>
+            <td className="py-3 pr-3 text-gray-600">
+                {formatDate(row.startDate)} ~ {formatDate(row.endDate)}
+            </td>
+            <td className="py-3 pr-3">{formatNumber(row.totalCost)}원</td>
+            <td className="py-3 pr-3">{row.ctr.toFixed(2)}%</td>
+            <td className="py-3 pr-3">{formatNumber(Math.round(row.cpc))}원</td>
+            <td className="py-3">{row.roas.toFixed(2)}%</td>
+        </tr>
     );
 }
