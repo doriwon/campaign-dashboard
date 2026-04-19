@@ -30,7 +30,41 @@ export default function CampaignModal({ open, onClose }: Props) {
                 </div>
 
                 <form onSubmit={onSubmit} className="space-y-4">
-                    캠페인 등록 폼
+                    {/* 캠페인명 */}
+                    <Field label="캠페인명">
+                        <input placeholder="2자 ~ 100자" className="input" />
+                    </Field>
+
+                    {/* 광고 매체 */}
+                    <Field label="광고 매체">
+                        <select className="input">
+                            <option value="">선택해주세요</option>
+                            <option value="Google">Google</option>
+                            <option value="Meta">Meta</option>
+                            <option value="Naver">Naver</option>
+                        </select>
+                    </Field>
+
+                    {/* 예산 */}
+                    <Field label="예산 (원)">
+                        <input type="number" placeholder="100 ~ 1,000,000,000" className="input" />
+                    </Field>
+
+                    {/* 집행 금액 */}
+                    <Field label="집행 금액 (원)">
+                        <input type="number" placeholder="0 ~ 예산 이하" className="input" />
+                    </Field>
+
+                    {/* 시작일 */}
+                    <Field label="시작일">
+                        <input type="date" className="input" />
+                    </Field>
+
+                    {/* 종료일 */}
+                    <Field label="종료일">
+                        <input type="date" className="input" />
+                    </Field>
+
                     <div className="flex justify-end gap-2 pt-2">
                         <button
                             type="button"
@@ -47,8 +81,18 @@ export default function CampaignModal({ open, onClose }: Props) {
                         </button>
                     </div>
                 </form>
-                <div className="text-sm text-gray-500"></div>
             </div>
+        </div>
+    );
+}
+
+// 필드 컴포넌트
+function Field({ label, error, children }: { label: string; error?: string; children: React.ReactNode }) {
+    return (
+        <div className="space-y-1">
+            <label className="block text-sm font-medium text-gray-700">{label}</label>
+            {children}
+            {error && <p className="text-xs text-red-500">{error}</p>}
         </div>
     );
 }
