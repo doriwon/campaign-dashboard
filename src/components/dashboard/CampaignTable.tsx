@@ -5,6 +5,7 @@ import { useEffect, useMemo, useState } from "react";
 import { Campaign } from "@/types";
 import { useQueryClient } from "@tanstack/react-query";
 import { CAMPAIGNS_KEY } from "@/hooks/useCampaigns";
+import LoadingSpinner from "../LoadingSpinner";
 
 type SortKey = "startDate" | "totalCost" | "ctr" | "cpc" | "roas";
 type SortDir = "asc" | "desc";
@@ -18,7 +19,7 @@ const STATUS_LABEL: Record<Status, string> = {
 };
 
 export default function CampaignTable() {
-    const { tableData } = useFilteredData();
+    const { tableData, isLoading } = useFilteredData();
     const queryClient = useQueryClient();
 
     const [page, setPage] = useState(1);
@@ -105,6 +106,14 @@ export default function CampaignTable() {
             setPage(totalPages);
         }
     }, [totalPages]);
+
+    if (isLoading)
+        return (
+            <section className="rounded-lg border p-4">
+                <h2 className="text-lg font-semibold mb-4">캠페인 목록</h2>
+                <LoadingSpinner />
+            </section>
+        );
 
     return (
         <section className="rounded-lg border p-4 space-y-4">

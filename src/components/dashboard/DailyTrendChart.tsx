@@ -4,6 +4,7 @@ import { useFilteredData } from "@/hooks/useFilteredData";
 import { useMemo, useState } from "react";
 import { LineChart, Line, XAxis, YAxis, ResponsiveContainer, Tooltip, Legend, CartesianGrid } from "recharts";
 import dayjs from "dayjs";
+import LoadingSpinner from "../LoadingSpinner";
 
 type MetricKey = "impressions" | "clicks" | "conversions" | "cost";
 
@@ -15,7 +16,7 @@ const METRICS: { key: MetricKey; label: string; color: string }[] = [
 ];
 
 export default function DailyTrendChart() {
-    const { chartData } = useFilteredData();
+    const { chartData, isLoading } = useFilteredData();
 
     // 초기값: 노출수 + 클릭수
     const [activeMetrics, setActiveMetrics] = useState<Set<MetricKey>>(new Set(["impressions", "clicks"]));
@@ -38,6 +39,14 @@ export default function DailyTrendChart() {
             })),
         [chartData],
     );
+
+    if (isLoading)
+        return (
+            <section className="rounded-lg border p-4">
+                <h2 className="text-lg font-semibold mb-4">일별 추이</h2>
+                <LoadingSpinner />
+            </section>
+        );
 
     // 빈 데이터 처리
     if (formattedData.length === 0) {

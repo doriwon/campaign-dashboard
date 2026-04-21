@@ -3,6 +3,7 @@
 import { useState, useMemo } from "react";
 import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, Cell } from "recharts";
 import { useFilteredData } from "@/hooks/useFilteredData";
+import LoadingSpinner from "../LoadingSpinner";
 
 type MetricKey = "roas" | "ctr" | "cpc";
 
@@ -14,7 +15,7 @@ const METRICS: { key: MetricKey; label: string }[] = [
 
 export default function CampaignRanking() {
     const [metric, setMetric] = useState<MetricKey>("roas");
-    const { tableData } = useFilteredData();
+    const { tableData, isLoading } = useFilteredData();
 
     const top3 = useMemo(() => {
         const sorted = [...tableData]
@@ -38,6 +39,14 @@ export default function CampaignRanking() {
         if (metric === "cpc") return `${Math.round(v).toLocaleString("ko-KR")}원`;
         return `${v.toFixed(2)}%`;
     };
+
+    if (isLoading)
+        return (
+            <section className="rounded-lg border p-4">
+                <h2 className="text-lg font-semibold mb-4">캠페인 랭킹 Top3</h2>
+                <LoadingSpinner />
+            </section>
+        );
 
     return (
         <section className="rounded-lg border p-4 space-y-4">
@@ -68,7 +77,7 @@ export default function CampaignRanking() {
             ) : (
                 <>
                     <ResponsiveContainer width="100%" height={200}>
-                        <BarChart data={top3} layout="vertical" margin={{ top: 0, right: 60, left: 0, bottom: 0 }}>
+                        <BarChart data={top3} layout="vertical" margin={{ top: 0, right: 0, left: 0, bottom: 0 }}>
                             <XAxis type="number" hide />
                             <YAxis
                                 type="category"
@@ -87,7 +96,7 @@ export default function CampaignRanking() {
                             />
                             <Bar dataKey="value" radius={[0, 4, 4, 0]} barSize={28}>
                                 {top3.map((d, i) => (
-                                    <Cell key={d.id} fill={i === 0 ? "#6366f1" : i === 1 ? "#8b5cf6" : "#a78bfa"} />
+                                    <Cell key={d.id} fill={i === 0 ? "#6366f1" : i === 1 ? "#818cf8" : "#a5b4fc"} />
                                 ))}
                             </Bar>
                         </BarChart>

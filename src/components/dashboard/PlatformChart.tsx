@@ -5,6 +5,7 @@ import { PieChart, Pie, Cell, Tooltip, ResponsiveContainer, Legend } from "recha
 import type { PieSectorDataItem } from "recharts/types/polar/Pie";
 import { useFilteredData } from "@/hooks/useFilteredData";
 import { useFilterStore } from "@/store/filterStore";
+import LoadingSpinner from "../LoadingSpinner";
 
 type MetricKey = "totalCost" | "totalImpressions" | "totalClicks" | "totalConversions";
 type Platform = "Google" | "Meta" | "Naver";
@@ -17,9 +18,9 @@ const METRICS: { key: MetricKey; label: string }[] = [
 ];
 
 const PLATFORM_COLORS: Record<Platform, string> = {
-    Google: "#4285f4",
-    Meta: "#1877f2",
-    Naver: "#03c75a",
+    Google: "#6366f1",
+    Meta: "#3b82f6",
+    Naver: "#10b981",
 };
 
 const PLATFORMS: Platform[] = ["Google", "Meta", "Naver"];
@@ -32,7 +33,7 @@ type DonutItem = {
 
 export default function PlatformChart() {
     const [metric, setMetric] = useState<MetricKey>("totalCost");
-    const { tableData } = useFilteredData();
+    const { tableData, isLoading } = useFilteredData();
     const { platforms, togglePlatform } = useFilterStore();
 
     const donutData = useMemo((): DonutItem[] => {
@@ -67,6 +68,14 @@ export default function PlatformChart() {
     const handleLabelClick = (name: Platform) => {
         togglePlatform(name);
     };
+
+    if (isLoading)
+        return (
+            <section className="rounded-lg border p-4">
+                <h2 className="text-lg font-semibold mb-4">플랫폼별 성과</h2>
+                <LoadingSpinner />
+            </section>
+        );
 
     return (
         <section className="rounded-lg border p-4 space-y-4">
@@ -128,7 +137,7 @@ export default function PlatformChart() {
                     </ResponsiveContainer>
 
                     {/* 수치 + 비중 표 */}
-                    <div className="w-full md:w-48 space-y-3">
+                    <div className="w-full md:min-w-[170px] space-y-3">
                         {donutData.map((d) => (
                             <div key={d.name} className="flex items-center justify-between text-sm">
                                 <div className="flex items-center gap-2">
@@ -143,7 +152,7 @@ export default function PlatformChart() {
                                         {d.name}
                                     </span>
                                 </div>
-                                <div className="text-right">
+                                <div className="text-right ">
                                     <p className="font-medium">{d.value.toLocaleString("ko-KR")}</p>
                                     <p className="text-xs text-gray-400">{d.percent.toFixed(1)}%</p>
                                 </div>

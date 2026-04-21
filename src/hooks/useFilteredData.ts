@@ -56,8 +56,8 @@ const EMPTY_STATS: StatsAccumulator = {
 
 export function useFilteredData() {
     const { dateRange, platforms, statuses } = useFilterStore();
-    const { data: campaigns = [] } = useCampaigns();
-    const { data: dailyStats = [] } = useDailyStats();
+    const { data: campaigns = [], isLoading: campaignsLoading } = useCampaigns();
+    const { data: dailyStats = [], isLoading: statsLoading } = useDailyStats();
 
     const filteredCampaigns = useMemo(() => {
         return campaigns.filter((c) => {
@@ -146,5 +146,5 @@ export function useFilteredData() {
         });
     }, [filteredCampaigns, filteredStats]);
 
-    return { filteredCampaigns, chartData, tableData };
+    return { filteredCampaigns, chartData, tableData, isLoading: campaignsLoading || statsLoading };
 }
