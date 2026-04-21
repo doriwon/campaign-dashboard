@@ -75,19 +75,19 @@ export default function GlobalFilter() {
             <div className="grid gap-4 md:grid-cols-3">
                 <div className="space-y-2">
                     <p className="text-sm font-medium">집행 기간</p>
-                    <div className="flex items-center gap-2">
+                    <div className="grid grid-cols-[minmax(0,1fr)_auto_minmax(0,1fr)] items-center gap-2">
                         <input
                             type="date"
                             value={localStart}
                             onChange={(e) => handleStartChange(e.target.value)}
-                            className="rounded border px-3 py-2 text-sm w-full"
+                            className="min-w-0 w-full rounded border px-2 py-2 text-sm"
                         />
-                        <span className="text-sm text-gray-500 flex-shrink-0">~</span>
+                        <span className="shrink-0 text-sm text-gray-500">~</span>
                         <input
                             type="date"
                             value={localEnd}
                             onChange={(e) => handleEndChange(e.target.value)}
-                            className="rounded border px-3 py-2 text-sm w-full"
+                            className="min-w-0 w-full rounded border px-2 py-2 text-sm"
                         />
                     </div>
                     {dateError && <p className="text-xs text-red-500">{dateError}</p>}

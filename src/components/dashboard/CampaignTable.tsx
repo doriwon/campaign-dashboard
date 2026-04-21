@@ -129,9 +129,10 @@ export default function CampaignTable() {
                         onChange={(e) => handleSearch(e.target.value)}
                         className="rounded border px-3 py-2 text-sm w-52"
                     />
-                    <span className="text-sm text-gray-500">
-                        검색 결과 {totalCount}건 / 전체 {tableData.length}건
-                    </span>
+                    <p className="text-sm text-gray-500">
+                        <span className="inline-block">검색 결과 {totalCount}건</span> /{" "}
+                        <span className="inline-block">전체 {tableData.length}건</span>
+                    </p>
                 </div>
 
                 {/* 일괄 상태변경 */}
