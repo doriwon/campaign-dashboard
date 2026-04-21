@@ -17,11 +17,7 @@ const isValidDate = (str: string): boolean => {
     return !isNaN(new Date(str).getTime());
 };
 
-// 연도가 4자리 초과인지 체크
-const hasInvalidYear = (str: string): boolean => {
-    const year = str.split("-")[0];
-    return year.length > 4;
-};
+const hasInvalidYear = (str: string): boolean => str.split("-")[0].length > 4;
 
 export default function GlobalFilter() {
     const { dateRange, platforms, statuses, setDateRange, togglePlatform, toggleStatus, resetFilter } =
@@ -29,32 +25,44 @@ export default function GlobalFilter() {
 
     const [localStart, setLocalStart] = useState(dateRange.start);
     const [localEnd, setLocalEnd] = useState(dateRange.end);
+    const [dateError, setDateError] = useState("");
 
     useEffect(() => {
         setLocalStart(dateRange.start);
         setLocalEnd(dateRange.end);
+        setDateError("");
     }, [dateRange.start, dateRange.end]);
 
-    const handleDateChange = (value: string, setter: (v: string) => void) => {
-        if (!value) return;
-        if (hasInvalidYear(value)) return;
-        setter(value);
+    const handleStartChange = (value: string) => {
+        if (!value || hasInvalidYear(value)) return;
+        setLocalStart(value);
+
+        if (!isValidDate(value)) {
+            setDateError("올바른 시작일을 입력해주세요");
+            return;
+        }
+        if (value > localEnd) {
+            setDateError("종료일이 시작일 이후여야 합니다");
+            return;
+        }
+        setDateError("");
+        setDateRange({ start: value, end: localEnd });
     };
 
-    const handleStartBlur = () => {
-        if (isValidDate(localStart)) {
-            setDateRange({ start: localStart, end: dateRange.end });
-        } else {
-            setLocalStart(dateRange.start);
-        }
-    };
+    const handleEndChange = (value: string) => {
+        if (!value || hasInvalidYear(value)) return;
+        setLocalEnd(value);
 
-    const handleEndBlur = () => {
-        if (isValidDate(localEnd)) {
-            setDateRange({ start: dateRange.start, end: localEnd });
-        } else {
-            setLocalEnd(dateRange.end);
+        if (!isValidDate(value)) {
+            setDateError("올바른 종료일을 입력해주세요");
+            return;
         }
+        if (value < localStart) {
+            setDateError("종료일이 시작일 이후여야 합니다");
+            return;
+        }
+        setDateError("");
+        setDateRange({ start: localStart, end: value });
     };
 
     return (
@@ -71,19 +79,18 @@ export default function GlobalFilter() {
                         <input
                             type="date"
                             value={localStart}
-                            onChange={(e) => handleDateChange(e.target.value, setLocalStart)}
-                            onBlur={handleStartBlur}
+                            onChange={(e) => handleStartChange(e.target.value)}
                             className="rounded border px-3 py-2 text-sm w-full"
                         />
                         <span className="text-sm text-gray-500 flex-shrink-0">~</span>
                         <input
                             type="date"
                             value={localEnd}
-                            onChange={(e) => handleDateChange(e.target.value, setLocalEnd)}
-                            onBlur={handleEndBlur}
+                            onChange={(e) => handleEndChange(e.target.value)}
                             className="rounded border px-3 py-2 text-sm w-full"
                         />
                     </div>
+                    {dateError && <p className="text-xs text-red-500">{dateError}</p>}
                 </div>
 
                 <div className="space-y-2">
