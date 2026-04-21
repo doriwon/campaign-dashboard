@@ -3,12 +3,11 @@
     "version": "0.1.0",
     "private": true,
     "scripts": {
-        "dev": "next dev",
+        "dev": "concurrently \"next dev\" \"json-server --watch db.json --port 3001\"",
+        "mock": "json-server --watch db.json --port 3001",
         "build": "next build",
         "start": "next start",
-        "lint": "eslint",
-        "mock": "json-server --watch db.json --port 3001",
-        "dev:all": "concurrently \"next dev\" \"json-server --watch db.json --port 3001\""
+        "lint": "eslint"
     },
     "dependencies": {
         "@hookform/resolvers": "^5.2.2",

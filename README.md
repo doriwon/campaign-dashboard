@@ -13,7 +13,10 @@ npm run dev
 ```
 
 > `npm run dev` 실행 시 Next.js(3000)와 json-server(3001)가 동시에 실행됩니다.
+>
 > 브라우저에서 http://localhost:3000 접속
+>
+> mock API는 http://localhost:3001 에서 확인할 수 있습니다.
 
 ---
 
